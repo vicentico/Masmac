@@ -18,7 +18,7 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 
-# Binaries and Object files
+# Binaries, Object files and build outputs
 [Bb]in/
 [Oo]bj/
 **/[Bb]in/
@@ -27,6 +27,51 @@ src/**/[Bb]in/
 src/**/[Oo]bj/
 tests/**/[Bb]in/
 tests/**/[Oo]bj/
+
+# Visual Studio / VS Code specific files
+*.dll
+*.pdb
+*.cache
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.csproj.AssemblyReference.cache
+*.csproj.CoreCompileInputs.cache
+*.csproj.FileListAbsolute.txt
+*.csproj.CopyComplete
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.iobj
+*.pch
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+
+# .NET specific
+project.nuget.cache
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+project.assets.json
+project.framework.json
+*.dll.config
+*.exe.config
+ref/
+refint/
 
 # Logs
 [Ll]og/
