@@ -4,11 +4,11 @@ namespace VetUberApp.Application.Interfaces;
 
 public interface IPaymentService
 {
-    Task<PaymentDto> CreateAsync(CreatePaymentDto dto);
-    Task<PaymentDto?> GetByIdAsync(string id);
-    Task<PaymentDto?> GetByAppointmentIdAsync(string appointmentId);
-    Task<IEnumerable<PaymentDto>> GetAllAsync();
-    Task<PaymentDto> UpdateAsync(string id, UpdatePaymentDto dto);
-    Task<PaymentDto> ProcessPaymentAsync(string id);
-    Task<PaymentDto> RefundPaymentAsync(string id, string reason);
+    Task<PaymentDto> CreatePaymentAsync(CreatePaymentDto dto);
+    Task<PaymentDto?> GetPaymentByIdAsync(string id);
+    Task<PaymentDto?> GetPaymentByAppointmentIdAsync(string appointmentId);
+    Task<IEnumerable<PaymentDto>> GetAllPaymentsAsync();
+    Task<PaymentDto?> UpdatePaymentAsync(string id, UpdatePaymentDto dto);
+    Task<PaymentDto?> ProcessPaymentAsync(string id);
+    Task<PaymentDto?> RefundPaymentAsync(string id, string reason);
 }

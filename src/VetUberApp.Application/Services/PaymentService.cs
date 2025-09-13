@@ -20,7 +20,7 @@ public class PaymentService : IPaymentService
         _appointmentRepository = appointmentRepository;
     }
 
-    public async Task<PaymentDto> CreateAsync(CreatePaymentDto dto)
+    public async Task<PaymentDto> CreatePaymentAsync(CreatePaymentDto dto)
     {
         var appointment = await _appointmentRepository.GetByIdAsync(dto.AppointmentId)
             ?? throw new InvalidOperationException("La cita especificada no existe.");
@@ -32,7 +32,8 @@ public class PaymentService : IPaymentService
             Amount = dto.Amount,
             Method = dto.Method,
             Status = PaymentStatus.Pending,
-            TransactionId = dto.TransactionId
+            TransactionId = dto.TransactionId,
+            CreatedAt = DateTime.UtcNow
         };
 
         await _paymentRepository.CreateAsync(payment);
@@ -40,7 +41,7 @@ public class PaymentService : IPaymentService
         return await GetPaymentDtoAsync(payment);
     }
 
-    public async Task<PaymentDto?> GetByIdAsync(string id)
+    public async Task<PaymentDto?> GetPaymentByIdAsync(string id)
     {
         var payment = await _paymentRepository.GetByIdAsync(id);
         if (payment == null)
@@ -49,7 +50,7 @@ public class PaymentService : IPaymentService
         return await GetPaymentDtoAsync(payment);
     }
 
-    public async Task<PaymentDto?> GetByAppointmentIdAsync(string appointmentId)
+    public async Task<PaymentDto?> GetPaymentByAppointmentIdAsync(string appointmentId)
     {
         var payment = await _paymentRepository.GetByAppointmentIdAsync(appointmentId);
         if (payment == null)
@@ -58,7 +59,7 @@ public class PaymentService : IPaymentService
         return await GetPaymentDtoAsync(payment);
     }
 
-    public async Task<IEnumerable<PaymentDto>> GetAllAsync()
+    public async Task<IEnumerable<PaymentDto>> GetAllPaymentsAsync()
     {
         var payments = await _paymentRepository.GetAllAsync();
         var dtos = new List<PaymentDto>();
@@ -71,7 +72,7 @@ public class PaymentService : IPaymentService
         return dtos;
     }
 
-    public async Task<PaymentDto> UpdateAsync(string id, UpdatePaymentDto dto)
+    public async Task<PaymentDto?> UpdatePaymentAsync(string id, UpdatePaymentDto dto)
     {
         var payment = await _paymentRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException("El pago especificado no existe.");
@@ -93,7 +94,7 @@ public class PaymentService : IPaymentService
         return await GetPaymentDtoAsync(payment);
     }
 
-    public async Task<PaymentDto> ProcessPaymentAsync(string id)
+    public async Task<PaymentDto?> ProcessPaymentAsync(string id)
     {
         var payment = await _paymentRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException("El pago especificado no existe.");
@@ -111,7 +112,7 @@ public class PaymentService : IPaymentService
         return await GetPaymentDtoAsync(payment);
     }
 
-    public async Task<PaymentDto> RefundPaymentAsync(string id, string reason)
+    public async Task<PaymentDto?> RefundPaymentAsync(string id, string reason)
     {
         var payment = await _paymentRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException("El pago especificado no existe.");
