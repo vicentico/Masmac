@@ -1,15 +1,14 @@
 using VetUberApp.Domain.Common;
+using VetUberApp.Domain.Enums;
 
 namespace VetUberApp.Domain.Entities;
 
 public class Review : BaseEntity
 {
-    public int Rating { get; set; }
-    public string Comment { get; set; } = default!;
-    public string ReviewerId { get; set; } = default!;
-    public User Reviewer { get; set; } = default!;
-    public string VeterinarianId { get; set; } = default!;
-    public Veterinarian Veterinarian { get; set; } = default!;
-    public string AppointmentId { get; set; } = default!;
-    public Appointment Appointment { get; set; } = default!;
+    public string AppointmentId { get; set; } = null!;
+    public string UserId { get; set; } = null!;
+    public string VeterinarianId { get; set; } = null!;
+    public decimal Rating { get; set; }
+    public string Comment { get; set; } = null!;
+    public ReviewType Type { get; set; }
 }

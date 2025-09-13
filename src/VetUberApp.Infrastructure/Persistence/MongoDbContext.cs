@@ -6,24 +6,34 @@ namespace VetUberApp.Infrastructure.Persistence;
 
 public class MongoDbContext
 {
-    private readonly IMongoDatabase _database;
+    protected readonly IMongoClient? _client;
+    private readonly IMongoDatabase? _database;
+
+    public MongoDbContext() { } // Constructor sin parámetros para mocking
 
     public MongoDbContext(IOptions<MongoDbSettings> settings)
     {
         var mongoSettings = MongoClientSettings.FromUrl(new MongoUrl(settings.Value.ConnectionString));
-        mongoSettings.AllowInsecureTls = true;
+        mongoSettings.ServerApi = new ServerApi(ServerApiVersion.V1);
         mongoSettings.UseTls = true;
-        mongoSettings.SslSettings = new SslSettings
-        {
-            EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
-        };
-        
-        var client = new MongoClient(mongoSettings);
-        _database = client.GetDatabase(settings.Value.DatabaseName);
+
+        _client = new MongoClient(mongoSettings);
+        _database = _client.GetDatabase(settings.Value.DatabaseName);
     }
 
-    public IMongoCollection<T> GetCollection<T>(string name)
+    public virtual IMongoCollection<T> GetCollection<T>(string name)
     {
+        if (_database == null)
+            throw new InvalidOperationException("Database not initialized. Use parameterized constructor for actual database operations.");
+            
         return _database.GetCollection<T>(name);
+    }
+    
+    public virtual IMongoDatabase GetDatabase()
+    {
+        if (_database == null)
+            throw new InvalidOperationException("Database not initialized. Use parameterized constructor for actual database operations.");
+            
+        return _database;
     }
 }

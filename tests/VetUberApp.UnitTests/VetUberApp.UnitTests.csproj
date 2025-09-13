@@ -17,5 +17,16 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="8.6.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+</ItemGroup>
+
+<ItemGroup>
+    <ProjectReference Include="..\..\src\VetUberApp.API\VetUberApp.API.csproj" />
+    <ProjectReference Include="..\..\src\VetUberApp.Domain\VetUberApp.Domain.csproj" />
+    <ProjectReference Include="..\..\src\VetUberApp.Application\VetUberApp.Application.csproj" />
+    <ProjectReference Include="..\..\src\VetUberApp.Infrastructure\VetUberApp.Infrastructure.csproj" />
+</ItemGroup>
 
 </Project>

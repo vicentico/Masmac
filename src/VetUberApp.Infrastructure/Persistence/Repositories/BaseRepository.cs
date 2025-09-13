@@ -16,7 +16,10 @@ public abstract class BaseRepository<T> where T : BaseEntity
 
     public virtual async Task<T> CreateAsync(T entity)
     {
-        entity.Id = ObjectId.GenerateNewId().ToString();
+        if (string.IsNullOrEmpty(entity.Id))
+        {
+            entity.Id = ObjectId.GenerateNewId().ToString();
+        }
         entity.CreatedAt = DateTime.UtcNow;
         await Collection.InsertOneAsync(entity);
         return entity;

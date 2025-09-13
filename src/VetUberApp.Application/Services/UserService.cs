@@ -1,13 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
-using VetUberApp.Application.DTOs;
+using VetUberApp.Application.DTOs; 
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Enums;
 using VetUberApp.Domain.Interfaces;
 
 namespace VetUberApp.Application.Services;
 
-public class UserService
+public class UserService : VetUberApp.Application.Interfaces.IUserService
 {
     private readonly IUserRepository _userRepository;
 

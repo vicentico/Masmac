@@ -16,6 +16,16 @@ public enum AppointmentStatus
     Cancelled
 }
 
+public enum AppointmentType
+{
+    Regular,
+    Emergency,
+    Vaccination,
+    CheckUp,
+    Surgery,
+    FollowUp
+}
+
 public enum PaymentStatus
 {
     Pending,
@@ -27,10 +37,22 @@ public enum PaymentStatus
 
 public enum PaymentMethod
 {
+    Cash,
     CreditCard,
     DebitCard,
-    PayPal,
-    Cash
+    BankTransfer,
+    MobileWallet,
+    Other
+}
+
+public enum ReviewType
+{
+    Overall,
+    ProfessionalSkill,
+    Communication,
+    Punctuality,
+    ValueForMoney,
+    Cleanliness
 }
 
 public enum PetType

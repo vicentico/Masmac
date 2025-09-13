@@ -11,6 +11,7 @@ public class User : BaseEntity
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
+    public string FullName => $"{FirstName} {LastName}";
     public string? ProfilePictureUrl { get; set; }
     public UserRole Role { get; set; }
     public bool IsVerified { get; set; }
