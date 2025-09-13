@@ -2,6 +2,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VetUberApp.Infrastructure.Persistence;
 using VetUberApp.Infrastructure.Persistence.Settings;
+using VetUberApp.Infrastructure.Persistence.Repositories;
+using VetUberApp.Application.Services;
+using VetUberApp.Domain.Interfaces;
 
 namespace VetUberApp.Infrastructure;
 
@@ -22,6 +25,12 @@ public static class DependencyInjection
         });
 
         services.AddSingleton<MongoDbContext>();
+
+        // Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        // Services
+        services.AddScoped<Application.Services.UserService>();
 
         return services;
     }

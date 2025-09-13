@@ -4,9 +4,9 @@ namespace VetUberApp.Domain.Interfaces;
 
 public interface IBaseRepository<T> where T : BaseEntity
 {
-    Task<T> GetByIdAsync(string id);
+    Task<T> CreateAsync(T entity);
+    Task<T?> GetByIdAsync(string id);
     Task<IEnumerable<T>> GetAllAsync();
-    Task<T> AddAsync(T entity);
-    Task<bool> UpdateAsync(T entity);
-    Task<bool> DeleteAsync(string id);
+    Task<T> UpdateAsync(T entity);
+    Task DeleteAsync(string id);
 }

@@ -2,6 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
+using VetUberApp.Domain.Common;
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.ValueObjects;
 
@@ -11,6 +12,10 @@ public static class MongoDbConfiguration
 {
     public static void Configure()
     {
+        // Configurar TLS/SSL y serialización de GUID
+        BsonSerializer.RegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
+        AppContext.SetSwitch("System.Net.Security.SslStream.DisableCertificateRevocation", true);
+
         // Convenciones globales
         var pack = new ConventionPack
         {
@@ -22,6 +27,20 @@ public static class MongoDbConfiguration
         // Serialización de tipos comunes
         BsonSerializer.RegisterSerializer(typeof(DateTime), new DateTimeSerializer(DateTimeKind.Utc));
         BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
+
+        // Configuración de la clase base
+        if (!BsonClassMap.IsClassMapRegistered(typeof(BaseEntity)))
+        {
+            BsonClassMap.RegisterClassMap<BaseEntity>(cm =>
+            {
+                cm.SetIsRootClass(true);
+                cm.MapIdField(c => c.Id)
+                    .SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.MapField(c => c.CreatedAt);
+                cm.MapField(c => c.UpdatedAt);
+                cm.MapField(c => c.IsDeleted);
+            });
+        }
 
         // Mapeo de entidades
         if (!BsonClassMap.IsClassMapRegistered(typeof(Address)))

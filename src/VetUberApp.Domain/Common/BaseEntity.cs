@@ -2,8 +2,8 @@ namespace VetUberApp.Domain.Common;
 
 public abstract class BaseEntity
 {
-    public string Id { get; set; } = default!;
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public bool IsDeleted { get; set; }
+    public virtual string Id { get; set; } = default!;
+    public virtual DateTime CreatedAt { get; set; }
+    public virtual DateTime? UpdatedAt { get; set; }
+    public virtual bool IsDeleted { get; set; }
 }
