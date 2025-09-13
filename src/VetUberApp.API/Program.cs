@@ -1,27 +1,51 @@
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using VetUberApp.Infrastructure;
 using VetUberApp.Infrastructure.Persistence.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "VetUber API", 
+        Version = "v1",
+        Description = "API para el servicio de veterinarios a domicilio"
+    });
+});
 
-// Add MongoDB Infrastructure
-builder.Services.AddInfrastructure(builder.Configuration);
+// Add MongoDB Infrastructure (temporarily disabled)
+//builder.Services.AddInfrastructure(builder.Configuration);
+//MongoDbConfiguration.Configure();
 
-// Configure MongoDB mappings
-MongoDbConfiguration.Configure();
+// Configure HTTPS
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.HttpsPort = 7155;
+});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "VetUber API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
+// Use HTTPS redirection before other middleware
 app.UseHttpsRedirection();
+
+app.UseAuthorization();
+app.MapControllers();
 
 var summaries = new[]
 {
