@@ -1,0 +1,11 @@
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\bin\Debug\net9.0\VetUberApp.Shared.deps.json
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\bin\Debug\net9.0\VetUberApp.Shared.dll
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\bin\Debug\net9.0\VetUberApp.Shared.pdb
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.AssemblyInfoInputs.cache
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.AssemblyInfo.cs
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.csproj.CoreCompileInputs.cache
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.dll
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\refint\VetUberApp.Shared.dll
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\VetUberApp.Shared.pdb
+D:\Cursor_AI\APP_masmac\Masmac\vet-uber-app\src\VetUberApp.Shared\obj\Debug\net9.0\ref\VetUberApp.Shared.dll
