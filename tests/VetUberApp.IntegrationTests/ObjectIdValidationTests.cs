@@ -121,13 +121,14 @@ public class ObjectIdValidationTests : IClassFixture<TestDatabaseFixture>
             LastName: "User",
             PhoneNumber: "+1234567890",
             ProfilePictureUrl: null,
-            Address: new AddressDto(
-                Street: "Updated Street",
-                City: "Updated City",
-                State: "Updated State",
-                ZipCode: "12345",
-                Country: "Updated Country"
-            )
+            Address: new AddressDto
+            {
+                Street = "Updated Street",
+                City = "Updated City",
+                State = "Updated State",
+                ZipCode = "12345",
+                Country = "Updated Country"
+            }
         );
 
         // Act & Assert
