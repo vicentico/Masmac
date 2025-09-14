@@ -7,13 +7,19 @@
 
 ## 🚀 Últimas Mejoras Implementadas
 
-### ✅ Clean Code & Best Practices (Enero 2025)
-- **ErrorConstants**: Centralización de mensajes de error para mejor mantenibilidad
-- **ValidationFilter Enhanced**: Refactorización con principios SOLID aplicados
-- **Test Architecture**: 100% de pruebas pasando con mejor aislamiento
-- **Documentation**: Documentación técnica comprehensiva agregada
+### ✅ Limpieza de Código y Optimización v1.2.0 (Enero 2025)
+- **Eliminación de Templates**: Removidos archivos Class1.cs y UnitTest1.cs de plantillas de Visual Studio
+- **Código No Utilizado**: Eliminado AppointmentBuilder.cs (209 líneas) y ModelValidator.cs sin referencias
+- **Correcciones de Compilación**: Arreglada sintaxis en ObjectIdValidationTests.cs para AddressDto
+- **Compilación Limpia**: ✅ Proyecto compila exitosamente sin warnings
+- **Reducción de Código**: ~250 líneas de código innecesario eliminadas
 
-📖 **Ver detalles completos**: [Clean Code Improvements](./documentation/clean-code-improvements.md)
+### ✅ Validación de ObjectId y Manejo de Errores v1.1.0 (Enero 2025)
+- **Validación Robusta**: Implementada validación automática de MongoDB ObjectId
+- **Manejo de Errores**: Respuestas HTTP consistentes para IDs inválidos
+- **Pruebas de Integración**: Cobertura completa de casos edge para validación
+
+📖 **Ver registro completo**: [Mejoras y Avances](./documentation/MEJORAS.md)
 
 ## 🏗️ Arquitectura
 
