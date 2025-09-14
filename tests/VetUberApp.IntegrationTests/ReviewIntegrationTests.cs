@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using VetUberApp.Application.DTOs;
-using VetUberApp.Application.Services;
+using VetUberApp.Application.Interfaces;
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Enums;
 using VetUberApp.Infrastructure.Persistence;
@@ -8,15 +8,16 @@ using FluentAssertions;
 
 namespace VetUberApp.IntegrationTests;
 
+[Collection("IntegrationTests")]
 public class ReviewIntegrationTests : IClassFixture<TestDatabaseFixture>
 {
-    private readonly ReviewService _reviewService;
+    private readonly IReviewService _reviewService;
     private readonly TestDatabaseFixture _fixture;
 
     public ReviewIntegrationTests(TestDatabaseFixture fixture)
     {
         _fixture = fixture;
-        _reviewService = _fixture.ServiceProvider.GetRequiredService<ReviewService>();
+        _reviewService = _fixture.ServiceProvider.GetRequiredService<IReviewService>();
     }
 
     [Fact]
@@ -168,7 +169,7 @@ public class ReviewIntegrationTests : IClassFixture<TestDatabaseFixture>
             FirstName = "Test",
             LastName = "Veterinarian",
             PhoneNumber = "1234567890",
-            LicenseNumber = "LICENSE123",
+            LicenseNumber = $"LIC{Guid.NewGuid().ToString()[..8].ToUpper()}",
             IsVerified = true,
             IsAvailable = true
         };
@@ -176,16 +177,45 @@ public class ReviewIntegrationTests : IClassFixture<TestDatabaseFixture>
         return await _fixture.VeterinarianRepository.CreateAsync(veterinarian);
     }
 
+    private async Task<Pet> CreateTestPet(string ownerId)
+    {
+        var pet = new Pet
+        {
+            OwnerId = ownerId,
+            Name = $"TestPet{Guid.NewGuid().ToString()[..8]}",
+            Type = PetType.Dog,
+            Breed = "Golden Retriever",
+            DateOfBirth = DateTime.UtcNow.AddYears(-3),
+            Weight = 25.5
+        };
+
+        return await _fixture.PetRepository.CreateAsync(pet);
+    }
+
     private async Task<Appointment> CreateTestAppointment(string userId, string veterinarianId)
     {
+        // Create a pet first since it's required
+        var pet = await CreateTestPet(userId);
+
+        // Small delay to ensure the pet is persisted
+        await Task.Delay(100);
+
         var appointment = new Appointment
         {
             OwnerId = userId,
             VeterinarianId = veterinarianId,
+            PetId = pet.Id,
             ScheduledDateTime = DateTime.UtcNow.AddDays(1),
+            Reason = "Regular checkup",
+            Type = AppointmentType.CheckUp,
             Status = AppointmentStatus.Completed
         };
 
-        return await _fixture.AppointmentRepository.CreateAsync(appointment);
+        var createdAppointment = await _fixture.AppointmentRepository.CreateAsync(appointment);
+        
+        // Small delay to ensure the appointment is persisted  
+        await Task.Delay(100);
+        
+        return createdAppointment;
     }
 }

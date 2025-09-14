@@ -59,7 +59,7 @@ public class ReviewService : IReviewService
         var review = await _reviewRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException("Review not found");
 
-        review.Rating = (int)dto.Rating;
+        review.Rating = (int)(dto.Rating ?? 0);
         review.Comment = dto.Comment ?? string.Empty;
 
         var updatedReview = await _reviewRepository.UpdateAsync(review);

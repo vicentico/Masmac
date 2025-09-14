@@ -4,6 +4,7 @@ using VetUberApp.Application.Services;
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Enums;
 using VetUberApp.Domain.Interfaces;
+using VetUberApp.Domain.Constants;
 using FluentAssertions;
 
 namespace VetUberApp.UnitTests.Services;
@@ -14,6 +15,7 @@ public class ReviewServiceTests
     private readonly Mock<IAppointmentRepository> _mockAppointmentRepository;
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IVeterinarianRepository> _mockVeterinarianRepository;
+    private readonly Mock<IPetRepository> _mockPetRepository;
     private readonly ReviewService _service;
 
     public ReviewServiceTests()
@@ -22,14 +24,14 @@ public class ReviewServiceTests
         _mockAppointmentRepository = new Mock<IAppointmentRepository>();
         _mockUserRepository = new Mock<IUserRepository>();
         _mockVeterinarianRepository = new Mock<IVeterinarianRepository>();
-        var mockPetRepository = new Mock<IPetRepository>();
+        _mockPetRepository = new Mock<IPetRepository>();
 
         _service = new ReviewService(
             _mockReviewRepository.Object,
             _mockAppointmentRepository.Object,
             _mockUserRepository.Object,
             _mockVeterinarianRepository.Object,
-            mockPetRepository.Object);
+            _mockPetRepository.Object);
     }
 
     [Fact]
@@ -58,7 +60,25 @@ public class ReviewServiceTests
             .ReturnsAsync(false);
 
         _mockReviewRepository.Setup(r => r.CreateAsync(It.IsAny<Review>()))
-            .ReturnsAsync((Review r) => r);
+            .ReturnsAsync((Review r) => 
+            {
+                r.Id = "123456789012345678901234"; // Valid MongoDB ObjectId
+                return r;
+            });
+
+        // Mock the related entities needed by GetReviewDtoAsync
+        var user = new User { Id = dto.UserId };
+        var veterinarian = new Veterinarian { Id = dto.VeterinarianId };
+        var pet = new Pet { Id = "pet123456789012345678901234" };
+
+        _mockUserRepository.Setup(r => r.GetByIdAsync(dto.UserId))
+            .ReturnsAsync(user);
+        
+        _mockVeterinarianRepository.Setup(r => r.GetByIdAsync(dto.VeterinarianId))
+            .ReturnsAsync(veterinarian);
+            
+        _mockPetRepository.Setup(r => r.GetByIdAsync(appointment.PetId))
+            .ReturnsAsync(pet);
 
         // Act
         var result = await _service.CreateAsync(dto);
@@ -90,7 +110,7 @@ public class ReviewServiceTests
 
         // Assert
         await action.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("La cita especificada no existe.");
+            .WithMessage(ErrorConstants.Appointments.NotFound);
     }
 
     [Fact]
@@ -153,7 +173,7 @@ public class ReviewServiceTests
 
         // Assert
         await action.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("El usuario ya ha creado una reseña para esta cita.");
+            .WithMessage(ErrorConstants.Reviews.UserAlreadyReviewed);
     }
 
     [Fact]
@@ -161,14 +181,19 @@ public class ReviewServiceTests
     {
         // Arrange
         var reviewId = "review123";
-        var dto = new UpdateReviewDto(
-            Rating: 4,
-            Comment: "Updated comment",
-            Type: ReviewType.ProfessionalSkill);
+        var dto = new UpdateReviewDto
+        {
+            Rating = 4,
+            Comment = "Updated comment",
+            Type = ReviewType.ProfessionalSkill
+        };
 
         var existingReview = new Review
         {
             Id = reviewId,
+            AppointmentId = "appointment123",
+            UserId = "user123",
+            VeterinarianId = "vet123",
             Rating = 5,
             Comment = "Original comment",
             Type = ReviewType.Overall
@@ -179,6 +204,21 @@ public class ReviewServiceTests
 
         _mockReviewRepository.Setup(r => r.UpdateAsync(It.IsAny<Review>()))
             .ReturnsAsync((Review r) => r);
+
+        // Mock the related entities needed by GetReviewDtoAsync
+        var appointment = new Appointment { Id = existingReview.AppointmentId, PetId = "pet123" };
+        var user = new User { Id = existingReview.UserId };
+        var veterinarian = new Veterinarian { Id = existingReview.VeterinarianId };
+        var pet = new Pet { Id = "pet123" };
+
+        _mockAppointmentRepository.Setup(r => r.GetByIdAsync(existingReview.AppointmentId))
+            .ReturnsAsync(appointment);
+        _mockUserRepository.Setup(r => r.GetByIdAsync(existingReview.UserId))
+            .ReturnsAsync(user);
+        _mockVeterinarianRepository.Setup(r => r.GetByIdAsync(existingReview.VeterinarianId))
+            .ReturnsAsync(veterinarian);
+        _mockPetRepository.Setup(r => r.GetByIdAsync(appointment.PetId))
+            .ReturnsAsync(pet);
 
         // Act
         var result = await _service.UpdateAsync(reviewId, dto);

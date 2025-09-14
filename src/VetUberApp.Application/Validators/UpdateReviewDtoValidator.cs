@@ -1,5 +1,6 @@
 using FluentValidation;
 using VetUberApp.Application.DTOs;
+using VetUberApp.Domain.Constants;
 
 namespace VetUberApp.Application.Validators;
 
@@ -11,19 +12,16 @@ public class UpdateReviewDtoValidator : AbstractValidator<UpdateReviewDto>
     public UpdateReviewDtoValidator()
     {
         RuleFor(x => x.Rating)
-            .InclusiveBetween(1.00m, 5.00m)
+            .InclusiveBetween(ValidationConstants.MinRating, ValidationConstants.MaxRating)
             .When(x => x.Rating.HasValue)
-            .WithMessage("La calificación debe estar entre 1.00 y 5.00")
-            .Must(rating => rating == null || decimal.Round(rating.Value, 2) == rating.Value)
-            .WithMessage("La calificación debe tener máximo 2 decimales");
+            .WithMessage(ErrorMessages.InvalidRatingRange)
+            .Must(rating => rating == null || decimal.Round(rating.Value, ValidationConstants.RatingDecimalPlaces) == rating.Value)
+            .WithMessage(ErrorMessages.InvalidRatingDecimals);
 
         RuleFor(x => x.Comment)
-            .MinimumLength(10)
+            .Length(ValidationConstants.MinCommentLength, ValidationConstants.MaxCommentLength)
             .When(x => !string.IsNullOrEmpty(x.Comment))
-            .WithMessage("El comentario debe tener al menos 10 caracteres")
-            .MaximumLength(1000)
-            .When(x => !string.IsNullOrEmpty(x.Comment))
-            .WithMessage("El comentario no puede exceder los 1000 caracteres");
+            .WithMessage(ErrorMessages.InvalidCommentLength);
 
         RuleFor(x => x.Type)
             .IsInEnum()

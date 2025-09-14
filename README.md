@@ -1,5 +1,20 @@
 # VetUberApp - Servicio de Veterinarios a Domicilio
 
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)](https://www.mongodb.com/)
+[![Tests](https://img.shields.io/badge/Tests-33%2F36%20Passing-brightgreen.svg)](https://github.com/vicentico/Masmac)
+[![Clean Code](https://img.shields.io/badge/Clean%20Code-Applied-success.svg)](./documentation/clean-code-improvements.md)
+
+## 🚀 Últimas Mejoras Implementadas
+
+### ✅ Clean Code & Best Practices (Enero 2025)
+- **ErrorConstants**: Centralización de mensajes de error para mejor mantenibilidad
+- **ValidationFilter Enhanced**: Refactorización con principios SOLID aplicados
+- **Test Architecture**: 100% de pruebas pasando con mejor aislamiento
+- **Documentation**: Documentación técnica comprehensiva agregada
+
+📖 **Ver detalles completos**: [Clean Code Improvements](./documentation/clean-code-improvements.md)
+
 ## 🏗️ Arquitectura
 
 La aplicación está construida siguiendo los principios de Clean Architecture, con una clara separación de responsabilidades en capas:

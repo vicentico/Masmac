@@ -1,34 +1,44 @@
 using VetUberApp.Application.DTOs;
+using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using VetUberApp.Application.Interfaces;
 using Xunit;
 
 namespace VetUberApp.IntegrationTests;
 
+[Collection("IntegrationTests")]
 public class ReviewServiceTests : IClassFixture<TestDatabaseFixture>
 {
     private readonly TestDatabaseFixture _fixture;
+    private readonly IReviewService _reviewService;
 
     public ReviewServiceTests(TestDatabaseFixture fixture)
     {
         _fixture = fixture;
+        _reviewService = _fixture.ServiceProvider.GetRequiredService<IReviewService>();
     }
 
     [Fact]
     public async Task CreateReview_ShouldCreateAndRetrieveReview()
     {
         // Arrange
+        var user = await CreateTestUser();
+        var veterinarian = await CreateTestVeterinarian();
+        var appointment = await CreateTestAppointment(user.Id, veterinarian.Id);
+
         var createReviewDto = new CreateReviewDto(
-            AppointmentId: TestDatabaseFixture.TestAppointmentId,
-            UserId: TestDatabaseFixture.TestUserId,
-            VeterinarianId: TestDatabaseFixture.TestVetId,
+            AppointmentId: appointment.Id,
+            UserId: user.Id,
+            VeterinarianId: veterinarian.Id,
             Rating: 5,
             Comment: "Excellent service!",
             Type: ReviewType.Overall
         );
 
         // Act
-        var createdReview = await _fixture.ReviewService.CreateAsync(createReviewDto);
-        var retrievedReview = await _fixture.ReviewService.GetByIdAsync(createdReview.Id);
+        var createdReview = await _reviewService.CreateAsync(createReviewDto);
+        var retrievedReview = await _reviewService.GetByIdAsync(createdReview.Id);
 
         // Assert
         Assert.NotNull(retrievedReview);
@@ -42,21 +52,26 @@ public class ReviewServiceTests : IClassFixture<TestDatabaseFixture>
     public async Task GetReviewsByVeterinarianId_ShouldReturnAllVetReviews()
     {
         // Arrange
-        var vetId = TestDatabaseFixture.TestVetId;
+        var user1 = await CreateTestUser();
+        var user2 = await CreateTestUser();
+        var veterinarian = await CreateTestVeterinarian();
+        var appointment1 = await CreateTestAppointment(user1.Id, veterinarian.Id);
+        var appointment2 = await CreateTestAppointment(user2.Id, veterinarian.Id);
+
         var reviewDtos = new[]
         {
             new CreateReviewDto(
-                AppointmentId: TestDatabaseFixture.TestAppointmentId,
-                UserId: TestDatabaseFixture.TestUserId,
-                VeterinarianId: vetId,
+                AppointmentId: appointment1.Id,
+                UserId: user1.Id,
+                VeterinarianId: veterinarian.Id,
                 Rating: 4,
                 Comment: "Good service",
                 Type: ReviewType.Overall
             ),
             new CreateReviewDto(
-                AppointmentId: TestDatabaseFixture.TestAppointmentId2,
-                UserId: TestDatabaseFixture.TestUser2Id,
-                VeterinarianId: vetId,
+                AppointmentId: appointment2.Id,
+                UserId: user2.Id,
+                VeterinarianId: veterinarian.Id,
                 Rating: 5,
                 Comment: "Excellent",
                 Type: ReviewType.Overall
@@ -65,32 +80,36 @@ public class ReviewServiceTests : IClassFixture<TestDatabaseFixture>
 
         foreach (var dto in reviewDtos)
         {
-            await _fixture.ReviewService.CreateAsync(dto);
+            await _reviewService.CreateAsync(dto);
         }
 
         // Act
-        var retrievedReviews = await _fixture.ReviewService.GetByVeterinarianIdAsync(vetId);
+        var retrievedReviews = await _reviewService.GetByVeterinarianIdAsync(veterinarian.Id);
 
         // Assert
         Assert.NotNull(retrievedReviews);
         Assert.Equal(2, retrievedReviews.Count());
-        Assert.All(retrievedReviews, r => Assert.Equal(vetId, r.Veterinarian.Id));
+        Assert.All(retrievedReviews, r => Assert.Equal(veterinarian.Id, r.Veterinarian.Id));
     }
 
     [Fact]
     public async Task UpdateReview_ShouldUpdateExistingReview()
     {
         // Arrange
+        var user = await CreateTestUser();
+        var veterinarian = await CreateTestVeterinarian();
+        var appointment = await CreateTestAppointment(user.Id, veterinarian.Id);
+
         var createReviewDto = new CreateReviewDto(
-            AppointmentId: TestDatabaseFixture.TestAppointmentId,
-            UserId: TestDatabaseFixture.TestUserId,
-            VeterinarianId: TestDatabaseFixture.TestVetId,
+            AppointmentId: appointment.Id,
+            UserId: user.Id,
+            VeterinarianId: veterinarian.Id,
             Rating: 3,
             Comment: "Average service",
             Type: ReviewType.Overall
         );
 
-        var createdReview = await _fixture.ReviewService.CreateAsync(createReviewDto);
+        var createdReview = await _reviewService.CreateAsync(createReviewDto);
 
         var updateReviewDto = new UpdateReviewDto(
             Rating: 4,
@@ -98,8 +117,8 @@ public class ReviewServiceTests : IClassFixture<TestDatabaseFixture>
         );
 
         // Act
-        var updatedReview = await _fixture.ReviewService.UpdateAsync(createdReview.Id, updateReviewDto);
-        var retrievedReview = await _fixture.ReviewService.GetByIdAsync(createdReview.Id);
+        var updatedReview = await _reviewService.UpdateAsync(createdReview.Id, updateReviewDto);
+        var retrievedReview = await _reviewService.GetByIdAsync(createdReview.Id);
 
         // Assert
         Assert.NotNull(retrievedReview);
@@ -111,22 +130,102 @@ public class ReviewServiceTests : IClassFixture<TestDatabaseFixture>
     public async Task DeleteReview_ShouldRemoveReview()
     {
         // Arrange
+        var user = await CreateTestUser();
+        var veterinarian = await CreateTestVeterinarian();
+        var appointment = await CreateTestAppointment(user.Id, veterinarian.Id);
+
         var createReviewDto = new CreateReviewDto(
-            AppointmentId: "testAppointmentId",
-            UserId: "testUserId",
-            VeterinarianId: "testVetId",
+            AppointmentId: appointment.Id,
+            UserId: user.Id,
+            VeterinarianId: veterinarian.Id,
             Rating: 5,
             Comment: "Great service",
             Type: ReviewType.Overall
         );
 
-        var createdReview = await _fixture.ReviewService.CreateAsync(createReviewDto);
+        var createdReview = await _reviewService.CreateAsync(createReviewDto);
 
         // Act
-        await _fixture.ReviewService.DeleteAsync(createdReview.Id);
+        await _reviewService.DeleteAsync(createdReview.Id);
 
         // Assert
-        var deletedReview = await _fixture.ReviewService.GetByIdAsync(createdReview.Id);
+        var deletedReview = await _reviewService.GetByIdAsync(createdReview.Id);
         Assert.Null(deletedReview);
+    }
+
+    // Helper methods for creating test entities
+    private async Task<User> CreateTestUser()
+    {
+        var user = new User
+        {
+            Email = $"test{Guid.NewGuid()}@example.com",
+            PasswordHash = "hashedPassword",
+            FirstName = "Test",
+            LastName = "User",
+            PhoneNumber = "1234567890",
+            Role = UserRole.Client,
+            IsVerified = true
+        };
+
+        return await _fixture.UserRepository.CreateAsync(user);
+    }
+
+    private async Task<Veterinarian> CreateTestVeterinarian()
+    {
+        var veterinarian = new Veterinarian
+        {
+            Email = $"vet{Guid.NewGuid()}@example.com",
+            PasswordHash = "hashedPassword",
+            FirstName = "Test",
+            LastName = "Veterinarian",
+            PhoneNumber = "1234567890",
+            LicenseNumber = $"LIC{Guid.NewGuid().ToString()[..8].ToUpper()}",
+            IsVerified = true,
+            IsAvailable = true
+        };
+
+        return await _fixture.VeterinarianRepository.CreateAsync(veterinarian);
+    }
+
+    private async Task<Pet> CreateTestPet(string ownerId)
+    {
+        var pet = new Pet
+        {
+            OwnerId = ownerId,
+            Name = $"TestPet{Guid.NewGuid().ToString()[..8]}",
+            Type = PetType.Dog,
+            Breed = "Golden Retriever",
+            DateOfBirth = DateTime.UtcNow.AddYears(-3),
+            Weight = 25.5
+        };
+
+        return await _fixture.PetRepository.CreateAsync(pet);
+    }
+
+    private async Task<Appointment> CreateTestAppointment(string userId, string veterinarianId)
+    {
+        // Create a pet first since it's required
+        var pet = await CreateTestPet(userId);
+
+        // Small delay to ensure the pet is persisted
+        await Task.Delay(100);
+
+        var appointment = new Appointment
+        {
+            OwnerId = userId,
+            VeterinarianId = veterinarianId,
+            PetId = pet.Id,
+            ScheduledDateTime = DateTime.UtcNow.AddDays(1),
+            Reason = "Regular checkup",
+            Type = AppointmentType.CheckUp,
+            Status = AppointmentStatus.Completed
+        };
+
+        var createdAppointment = await _fixture.AppointmentRepository.CreateAsync(appointment);
+        
+        // Small delay to ensure the appointment is persisted
+        await Task.Delay(100);
+        
+        return createdAppointment;
     }
 }

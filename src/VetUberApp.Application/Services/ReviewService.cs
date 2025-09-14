@@ -1,8 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using VetUberApp.Application.DTOs;
 using VetUberApp.Application.Interfaces;
+using VetUberApp.Application.Factories;
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Interfaces;
+using VetUberApp.Domain.Constants;
 
 namespace VetUberApp.Application.Services;
 
@@ -28,26 +29,14 @@ public class ReviewService : IReviewService
         _petRepository = petRepository;
     }
 
-    private void ValidateDto<T>(T dto) where T : class
-    {
-        var validationContext = new ValidationContext(dto);
-        var validationResults = new List<ValidationResult>();
-        if (!Validator.TryValidateObject(dto, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(vr => vr.ErrorMessage);
-            throw new ValidationException($"Errores de validación: {string.Join(", ", errorMessages)}");
-        }
-    }
-
     public async Task<ReviewDto> CreateAsync(CreateReviewDto dto)
     {
-        // Validar el DTO usando DataAnnotations
-        ValidateDto(dto);
+        // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
         
         // Verificar que la cita existe
         var appointment = await _appointmentRepository.GetByIdAsync(dto.AppointmentId);
         if (appointment == null)
-            throw new InvalidOperationException("La cita especificada no existe.");
+            throw new InvalidOperationException(ErrorConstants.Appointments.NotFound);
 
         // Verificar que el usuario es el dueño de la mascota asociada a la cita
         if (appointment.OwnerId != dto.UserId)
@@ -60,7 +49,7 @@ public class ReviewService : IReviewService
         // Verificar que el usuario no ha creado ya una reseña para esta cita
         var hasReviewed = await _reviewRepository.HasUserReviewedAppointmentAsync(dto.UserId, dto.AppointmentId);
         if (hasReviewed)
-            throw new InvalidOperationException("El usuario ya ha creado una reseña para esta cita.");
+            throw new InvalidOperationException(ErrorConstants.Reviews.UserAlreadyReviewed);
 
         // Validar la calificación
         if (dto.Rating < 1 || dto.Rating > 5)
@@ -137,12 +126,11 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDto> UpdateAsync(string id, UpdateReviewDto dto)
     {
-        // Validar el DTO usando DataAnnotations
-        ValidateDto(dto);
+        // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
         
         var review = await _reviewRepository.GetByIdAsync(id);
         if (review == null)
-            throw new InvalidOperationException("La reseña especificada no existe.");
+            throw new InvalidOperationException(ErrorConstants.Reviews.NotFound);
 
         // Actualizar los campos
         if (dto.Rating.HasValue)
@@ -176,60 +164,26 @@ public class ReviewService : IReviewService
     private async Task<ReviewDto> GetReviewDtoAsync(Review review)
     {
         if (string.IsNullOrEmpty(review.Id))
-            throw new InvalidOperationException("La reseña no tiene un ID válido.");
+            throw new InvalidOperationException(ErrorConstants.Reviews.InvalidId);
 
         var appointment = await _appointmentRepository.GetByIdAsync(review.AppointmentId)
-            ?? throw new InvalidOperationException("No se encontró la cita asociada a la reseña.");
-
-        if (string.IsNullOrEmpty(appointment.Id))
-            throw new InvalidOperationException("La cita no tiene un ID válido.");
+            ?? throw new InvalidOperationException(ErrorConstants.Appointments.NotFoundForReview);
 
         var user = await _userRepository.GetByIdAsync(review.UserId)
-            ?? throw new InvalidOperationException("No se encontró el usuario asociado a la reseña.");
-
-        if (string.IsNullOrEmpty(user.Id))
-            throw new InvalidOperationException("El usuario no tiene un ID válido.");
+            ?? throw new InvalidOperationException(ErrorConstants.Users.NotFoundForReview);
 
         var veterinarian = await _veterinarianRepository.GetByIdAsync(review.VeterinarianId)
-            ?? throw new InvalidOperationException("No se encontró el veterinario asociado a la reseña.");
+            ?? throw new InvalidOperationException(ErrorConstants.Veterinarians.NotFoundForReview);
 
-        if (string.IsNullOrEmpty(veterinarian.Id))
-            throw new InvalidOperationException("El veterinario no tiene un ID válido.");
-
+        // Obtener la mascota a través de la cita
         var pet = await _petRepository.GetByIdAsync(appointment.PetId)
-            ?? throw new InvalidOperationException("No se encontró la mascota asociada a la reseña.");
+            ?? throw new InvalidOperationException(ErrorConstants.Pets.NotFoundForAppointment);
 
-        if (string.IsNullOrEmpty(pet.Id))
-            throw new InvalidOperationException("La mascota no tiene un ID válido.");
+        // Asignar entidades de navegación para el Factory
+        appointment.Pet = pet;
+        appointment.Veterinarian = veterinarian;
 
-        return new ReviewDto(
-            review.Id!, // Ya validamos que no es null
-            new AppointmentBasicDto
-            {
-                Id = appointment.Id!, // Ya validamos que no es null
-                VeterinarianName = veterinarian.FullName,
-                PetName = pet.Name,
-                ScheduledDateTime = appointment.ScheduledDateTime,
-                Status = appointment.Status
-            },
-            new UserBasicDto
-            {
-                Id = user.Id!, // Ya validamos que no es null
-                Name = $"{user.FirstName} {user.LastName}",
-                Email = user.Email,
-                Phone = user.PhoneNumber
-            },
-            new VeterinarianBasicDto
-            {
-                Id = veterinarian.Id!, // Ya validamos que no es null
-                Name = veterinarian.FullName,
-                Specialty = veterinarian.Specialties.FirstOrDefault() ?? "General",
-                LicenseNumber = veterinarian.LicenseNumber
-            },
-            review.Rating,
-            review.Comment,
-            review.Type,
-            review.CreatedAt,
-            review.UpdatedAt);
+        // Usar el Factory para crear el DTO
+        return DtoFactory.CreateReviewDto(review, appointment, user, veterinarian);
     }
 }
