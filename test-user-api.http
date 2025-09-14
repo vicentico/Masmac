@@ -1,0 +1,63 @@
+# Test para verificar que el endpoint de usuarios funciona correctamente
+# Esto debería resolver el error 500 original
+
+### GET all users
+GET http://localhost:5233/api/Users
+Accept: application/json
+
+### POST create new user - Test válido
+POST http://localhost:5233/api/Users
+Content-Type: application/json
+
+{
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "email": "juan.perez@test.com",
+    "phoneNumber": "+1234567890",
+    "password": "Password123!",
+    "address": {
+        "street": "Calle Principal 123",
+        "city": "Madrid",
+        "state": "Madrid",
+        "zipCode": "28001",
+        "country": "Spain"
+    }
+}
+
+### POST create new user - Test con email inválido (debería retornar error de validación)
+POST http://localhost:5233/api/Users
+Content-Type: application/json
+
+{
+    "firstName": "Ana",
+    "lastName": "García",
+    "email": "email-invalido",
+    "phoneNumber": "+1234567890",
+    "password": "Password123!",
+    "address": {
+        "street": "Calle Secundaria 456",
+        "city": "Barcelona",
+        "state": "Cataluña",
+        "zipCode": "08001",
+        "country": "Spain"
+    }
+}
+
+### POST create new user - Test con password débil (debería retornar error de validación)
+POST http://localhost:5233/api/Users
+Content-Type: application/json
+
+{
+    "firstName": "María",
+    "lastName": "López",
+    "email": "maria.lopez@test.com",
+    "phoneNumber": "+1234567890",
+    "password": "123",
+    "address": {
+        "street": "Avenida Central 789",
+        "city": "Valencia",
+        "state": "Valencia", 
+        "zipCode": "46001",
+        "country": "Spain"
+    }
+}

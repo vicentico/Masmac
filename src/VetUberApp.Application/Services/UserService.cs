@@ -4,6 +4,7 @@ using VetUberApp.Application.DTOs;
 using VetUberApp.Domain.Entities;
 using VetUberApp.Domain.Enums;
 using VetUberApp.Domain.Interfaces;
+using VetUberApp.Domain.Constants;
 
 namespace VetUberApp.Application.Services;
 
@@ -20,7 +21,7 @@ public class UserService : VetUberApp.Application.Interfaces.IUserService
     {
         if (await _userRepository.ExistsAsync(dto.Email))
         {
-            throw new InvalidOperationException("Email already exists");
+            throw new InvalidOperationException(ErrorConstants.Users.EmailAlreadyExists);
         }
 
         var user = new User
@@ -45,8 +46,16 @@ public class UserService : VetUberApp.Application.Interfaces.IUserService
 
     public async Task<UserDto?> GetByIdAsync(string id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-        return user != null ? MapToDto(user) : null;
+        try
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            return user != null ? MapToDto(user) : null;
+        }
+        catch (ArgumentException)
+        {
+            // Si el ID no es válido, devolvemos null
+            return null;
+        }
     }
 
     public async Task<IEnumerable<UserDto>> GetAllAsync()
@@ -57,23 +66,39 @@ public class UserService : VetUberApp.Application.Interfaces.IUserService
 
     public async Task<UserDto> UpdateAsync(string id, UpdateUserDto dto)
     {
-        var user = await _userRepository.GetByIdAsync(id) 
-            ?? throw new InvalidOperationException("User not found");
+        try
+        {
+            var user = await _userRepository.GetByIdAsync(id) 
+                ?? throw new InvalidOperationException(ErrorConstants.Users.NotFound);
 
-        user.FirstName = dto.FirstName;
-        user.LastName = dto.LastName;
-        user.PhoneNumber = dto.PhoneNumber;
-        user.ProfilePictureUrl = dto.ProfilePictureUrl;
-        user.Address = dto.Address;
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.ProfilePictureUrl = dto.ProfilePictureUrl;
+            user.Address = dto.Address;
 
-        await _userRepository.UpdateAsync(user);
+            await _userRepository.UpdateAsync(user);
 
-        return MapToDto(user);
+            return MapToDto(user);
+        }
+        catch (ArgumentException)
+        {
+            // Si el ID no es válido, lanzamos una excepción más específica
+            throw new InvalidOperationException(ErrorConstants.Users.NotFound);
+        }
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        await _userRepository.DeleteAsync(id);
+        try
+        {
+            return await _userRepository.DeleteAsync(id);
+        }
+        catch (ArgumentException)
+        {
+            // Si el ID no es válido, consideramos que no se puede eliminar
+            return false;
+        }
     }
 
     private static UserDto MapToDto(User user)

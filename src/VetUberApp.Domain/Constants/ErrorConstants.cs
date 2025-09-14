@@ -48,6 +48,12 @@ public static class ErrorConstants
         public const string NotFound = "No se encontró el usuario especificado.";
         public const string NotFoundForReview = "No se encontró el usuario asociado a la reseña.";
         public const string InvalidEmail = "El formato del email no es válido.";
+        public const string EmailAlreadyExists = "El email ya está registrado en el sistema.";
+        public const string InvalidPassword = "La contraseña no cumple con los requisitos mínimos.";
+        public const string InvalidPhoneNumber = "El número de teléfono no tiene un formato válido.";
+        public const string CannotCreate = "No se pudo crear el usuario.";
+        public const string CannotUpdate = "No se pudo actualizar el usuario.";
+        public const string CannotDelete = "No se pudo eliminar el usuario.";
     }
 
     #endregion

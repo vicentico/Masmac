@@ -309,6 +309,6 @@ public class TestDatabaseFixture : IDisposable
 
     public void Dispose()
     {
-        CleanDatabase().Wait();
+       // CleanDatabase().Wait();
     }
 }

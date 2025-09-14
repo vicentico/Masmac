@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VetUberApp.Application.DTOs;
-using VetUberApp.Application.Services;
+using VetUberApp.Application.Interfaces;
 
 namespace VetUberApp.API.Controllers;
 
@@ -11,9 +11,9 @@ namespace VetUberApp.API.Controllers;
 [ApiExplorerSettings(GroupName = "v1")]
 public class UsersController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public UsersController(UserService userService)
+    public UsersController(IUserService userService)
     {
         _userService = userService;
     }
@@ -47,15 +47,17 @@ public class UsersController : ControllerBase
     /// <param name="id">ID del usuario</param>
     /// <returns>Datos del usuario</returns>
     /// <response code="200">Usuario encontrado</response>
+    /// <response code="400">ID de usuario inválido</response>
     /// <response code="404">Usuario no encontrado</response>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserDto>> GetById(string id)
     {
         var user = await _userService.GetByIdAsync(id);
         if (user == null)
-            return NotFound();
+            return NotFound(new { message = "Usuario no encontrado" });
 
         return user;
     }
@@ -107,7 +109,13 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(string id)
     {
-        await _userService.DeleteAsync(id);
+        var deleted = await _userService.DeleteAsync(id);
+        
+        if (!deleted)
+        {
+            return NotFound(new { message = "Usuario no encontrado" });
+        }
+        
         return NoContent();
     }
 }

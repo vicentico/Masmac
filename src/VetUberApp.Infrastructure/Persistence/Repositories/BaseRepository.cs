@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using VetUberApp.Domain.Common;
 using VetUberApp.Domain.Constants;
+using VetUberApp.Infrastructure.Common;
 
 namespace VetUberApp.Infrastructure.Persistence.Repositories;
 
@@ -45,11 +46,10 @@ public abstract class BaseRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="id">ID de la entidad</param>
     /// <returns>La entidad encontrada o null si no existe</returns>
-    /// <exception cref="ArgumentException">Si el ID es null o vacío</exception>
+    /// <exception cref="ArgumentException">Si el ID es null o vacío o no es un ObjectId válido</exception>
     public virtual async Task<T?> GetByIdAsync(string id)
     {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentException(ErrorConstants.Repository.InvalidId, nameof(id));
+        MongoDbHelper.ValidateObjectId(id, nameof(id));
 
         return await Collection.Find(x => x.Id == id && !x.IsDeleted).FirstOrDefaultAsync();
     }
@@ -93,10 +93,12 @@ public abstract class BaseRepository<T> where T : BaseEntity
     /// <param name="entity">Entidad con los nuevos datos</param>
     /// <returns>La entidad actualizada</returns>
     /// <exception cref="ArgumentNullException">Si la entidad es null</exception>
+    /// <exception cref="ArgumentException">Si el ID de la entidad no es un ObjectId válido</exception>
     /// <exception cref="InvalidOperationException">Si la entidad no existe</exception>
     public virtual async Task<T> UpdateAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
+        MongoDbHelper.ValidateObjectId(entity.Id, nameof(entity.Id));
         
         entity.UpdatedAt = DateTime.UtcNow;
         
@@ -115,12 +117,11 @@ public abstract class BaseRepository<T> where T : BaseEntity
     /// Elimina lógicamente una entidad (soft delete)
     /// </summary>
     /// <param name="id">ID de la entidad a eliminar</param>
-    /// <exception cref="ArgumentException">Si el ID es null o vacío</exception>
-    /// <exception cref="InvalidOperationException">Si la entidad no existe</exception>
-    public virtual async Task DeleteAsync(string id)
+    /// <returns>True si se eliminó correctamente, false si no se encontró la entidad</returns>
+    /// <exception cref="ArgumentException">Si el ID es null, vacío o no es un ObjectId válido</exception>
+    public virtual async Task<bool> DeleteAsync(string id)
     {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentException("El ID no puede ser null o vacío", nameof(id));
+        MongoDbHelper.ValidateObjectId(id, nameof(id));
 
         var result = await Collection.UpdateOneAsync(
             x => x.Id == id && !x.IsDeleted,
@@ -129,24 +130,21 @@ public abstract class BaseRepository<T> where T : BaseEntity
                 .Set(x => x.UpdatedAt, DateTime.UtcNow)
         );
         
-        if (result.MatchedCount == 0)
-            throw new InvalidOperationException($"No se encontró la entidad con ID: {id}");
+        return result.MatchedCount > 0;
     }
 
     /// <summary>
     /// Elimina físicamente una entidad de la base de datos
     /// </summary>
     /// <param name="id">ID de la entidad a eliminar</param>
-    /// <exception cref="ArgumentException">Si el ID es null o vacío</exception>
-    /// <exception cref="InvalidOperationException">Si la entidad no existe</exception>
-    public virtual async Task HardDeleteAsync(string id)
+    /// <returns>True si se eliminó correctamente, false si no se encontró la entidad</returns>
+    /// <exception cref="ArgumentException">Si el ID es null, vacío o no es un ObjectId válido</exception>
+    public virtual async Task<bool> HardDeleteAsync(string id)
     {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentException("El ID no puede ser null o vacío", nameof(id));
+        MongoDbHelper.ValidateObjectId(id, nameof(id));
 
         var result = await Collection.DeleteOneAsync(x => x.Id == id);
         
-        if (result.DeletedCount == 0)
-            throw new InvalidOperationException($"No se encontró la entidad con ID: {id}");
+        return result.DeletedCount > 0;
     }
 }

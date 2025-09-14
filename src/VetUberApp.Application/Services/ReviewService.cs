@@ -31,18 +31,20 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDto> CreateAsync(CreateReviewDto dto)
     {
-        // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
-        
-        // Verificar que la cita existe
-        var appointment = await _appointmentRepository.GetByIdAsync(dto.AppointmentId);
-        if (appointment == null)
-            throw new InvalidOperationException(ErrorConstants.Appointments.NotFound);
+        try
+        {
+            // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
+            
+            // Verificar que la cita existe
+            var appointment = await _appointmentRepository.GetByIdAsync(dto.AppointmentId);
+            if (appointment == null)
+                throw new InvalidOperationException(ErrorConstants.Appointments.NotFound);
 
-        // Verificar que el usuario es el dueño de la mascota asociada a la cita
-        if (appointment.OwnerId != dto.UserId)
-            throw new InvalidOperationException("El usuario no está autorizado para crear una reseña para esta cita.");
+            // Verificar que el usuario es el dueño de la mascota asociada a la cita
+            if (appointment.OwnerId != dto.UserId)
+                throw new InvalidOperationException("El usuario no está autorizado para crear una reseña para esta cita.");
 
-        // Verificar que el veterinario es el asociado a la cita
+            // Verificar que el veterinario es el asociado a la cita
         if (appointment.VeterinarianId != dto.VeterinarianId)
             throw new InvalidOperationException("El veterinario especificado no corresponde a esta cita.");
 
@@ -68,6 +70,12 @@ public class ReviewService : IReviewService
         await _reviewRepository.CreateAsync(review);
 
         return await GetReviewDtoAsync(review);
+        }
+        catch (ArgumentException)
+        {
+            // Convertir ArgumentException de ObjectId inválido a InvalidOperationException
+            throw new InvalidOperationException(ErrorConstants.Appointments.NotFound);
+        }
     }
 
     public async Task<ReviewDto?> GetByIdAsync(string id)
@@ -126,25 +134,33 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDto> UpdateAsync(string id, UpdateReviewDto dto)
     {
-        // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
-        
-        var review = await _reviewRepository.GetByIdAsync(id);
-        if (review == null)
-            throw new InvalidOperationException(ErrorConstants.Reviews.NotFound);
-
-        // Actualizar los campos
-        if (dto.Rating.HasValue)
-            review.Rating = dto.Rating.Value;
+        try
+        {
+            // Nota: La validación del DTO se maneja automáticamente por FluentValidation en el ValidationFilter
             
-        if (!string.IsNullOrEmpty(dto.Comment))
-            review.Comment = dto.Comment;
+            var review = await _reviewRepository.GetByIdAsync(id);
+            if (review == null)
+                throw new InvalidOperationException(ErrorConstants.Reviews.NotFound);
 
-        if (dto.Type.HasValue)
-            review.Type = dto.Type.Value;
+            // Actualizar los campos
+            if (dto.Rating.HasValue)
+                review.Rating = dto.Rating.Value;
+                
+            if (!string.IsNullOrEmpty(dto.Comment))
+                review.Comment = dto.Comment;
 
-        await _reviewRepository.UpdateAsync(review);
+            if (dto.Type.HasValue)
+                review.Type = dto.Type.Value;
 
-        return await GetReviewDtoAsync(review);
+            await _reviewRepository.UpdateAsync(review);
+
+            return await GetReviewDtoAsync(review);
+        }
+        catch (ArgumentException)
+        {
+            // Convertir ArgumentException de ObjectId inválido a InvalidOperationException
+            throw new InvalidOperationException(ErrorConstants.Reviews.NotFound);
+        }
     }
 
     public async Task DeleteAsync(string id)
