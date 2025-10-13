@@ -41,12 +41,81 @@ public class TestDatabaseFixture : IDisposable
         }
     }
 
+    private static string GetMongoConnectionString()
+    {
+        // 1. Variable de entorno explícita (para CI/CD)
+        var envConnectionString = Environment.GetEnvironmentVariable("MongoDb__ConnectionString");
+        if (!string.IsNullOrEmpty(envConnectionString))
+        {
+            Console.WriteLine("Usando conexión MongoDB desde variable de entorno");
+            return envConnectionString;
+        }
+
+        // 2. Detectar si estamos en CI o si MongoDB local está disponible
+        if (IsRunningInCI())
+        {
+            Console.WriteLine("Detectado entorno CI - usando MongoDB local");
+            return "mongodb://localhost:27017";
+        }
+
+        if (IsLocalMongoAvailable())
+        {
+            Console.WriteLine("Detectada instancia local de MongoDB");
+            return "mongodb://localhost:27017";
+        }
+
+        // 3. Fallback a MongoDB Atlas para desarrollo (pero con manejo de errores)
+        Console.WriteLine("Intentando usar MongoDB Atlas para desarrollo");
+        return "mongodb+srv://integracion:123123123@cluster0.nbjwfob.mongodb.net/?retryWrites=true&w=majority&authSource=admin";
+    }
+
+    private static string GetDatabaseName()
+    {
+        var envDatabaseName = Environment.GetEnvironmentVariable("MongoDb__DatabaseName");
+        if (!string.IsNullOrEmpty(envDatabaseName))
+        {
+            return envDatabaseName;
+        }
+
+        return IsRunningInCI() ? "VetUberAppTest" : "VetUberTestDb";
+    }
+
+    private static bool IsRunningInCI()
+    {
+        // Detectar si estamos ejecutando en un entorno de CI
+        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")) ||
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_NUMBER"));
+    }
+
+    private static bool IsLocalMongoAvailable()
+    {
+        try
+        {
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("test");
+            database.RunCommand<BsonDocument>(new BsonDocument { { "ping", 1 } });
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public TestDatabaseFixture()
     {
+        // Determinar la conexión según el entorno
+        var connectionString = GetMongoConnectionString();
+        var databaseName = GetDatabaseName();
+        
+        Console.WriteLine($"Configurando conexión a MongoDB: {connectionString}");
+        Console.WriteLine($"Base de datos: {databaseName}");
+        
         var initialData = new List<KeyValuePair<string, string?>>
         {
-            new("MongoDb:ConnectionString", "mongodb+srv://integracion:123123123@cluster0.nbjwfob.mongodb.net/?retryWrites=true&w=majority&authSource=admin"),
-            new("MongoDb:DatabaseName", "VetUberTestDb")
+            new("MongoDb:ConnectionString", connectionString),
+            new("MongoDb:DatabaseName", databaseName)
         };
 
         var configuration = new ConfigurationBuilder()
