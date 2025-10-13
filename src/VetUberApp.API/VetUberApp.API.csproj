@@ -6,6 +6,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    
+    <!-- Project Metadata -->
+    <AssemblyTitle>VetUberApp API</AssemblyTitle>
+    <AssemblyDescription>REST API for veterinary home-service platform</AssemblyDescription>
+    <AssemblyProduct>VetUberApp</AssemblyProduct>
+    <AssemblyCompany>Masmac</AssemblyCompany>
+    <AssemblyCopyright>Copyright © 2025 Masmac</AssemblyCopyright>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    
+    <!-- Docker configuration -->
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>

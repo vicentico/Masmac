@@ -1,0 +1,91 @@
+name: 🐛 Bug Report
+description: Reportar un bug en VetUberApp
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees:
+  - vicentico
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar este bug. Por favor llena la información requerida para que podamos investigar el problema.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 🐛 Descripción del bug
+      description: Una descripción clara y concisa de cuál es el bug.
+      placeholder: Describe el problema que estás experimentando...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 🔄 Pasos para reproducir
+      description: Pasos para reproducir el comportamiento
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '....'
+        3. Desplazarse hasta '....'
+        4. Ver error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ Comportamiento esperado
+      description: Una descripción clara y concisa de lo que esperabas que sucediera.
+      placeholder: Describe qué debería suceder...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ Comportamiento actual
+      description: Una descripción clara y concisa de lo que está sucediendo actualmente.
+      placeholder: Describe qué está sucediendo en su lugar...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 🌍 Entorno
+      description: ¿En qué entorno ocurre el problema?
+      options:
+        - Desarrollo local
+        - Staging
+        - Producción
+        - Todos los entornos
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 Logs relevantes
+      description: Si es aplicable, agrega logs que ayuden a explicar tu problema.
+      render: shell
+      placeholder: Pega aquí los logs relevantes...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📝 Información adicional
+      description: Agrega cualquier otro contexto sobre el problema aquí.
+      placeholder: Cualquier información adicional que pueda ser útil...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Confirmación
+      description: Por favor confirma lo siguiente
+      options:
+        - label: He buscado problemas similares antes de crear este issue
+          required: true
+        - label: He proporcionado toda la información necesaria para reproducir el problema
+          required: true

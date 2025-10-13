@@ -1,9 +1,12 @@
 # VetUberApp - Servicio de Veterinarios a Domicilio
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)](https://www.mongodb.com/)
+[![CI/CD](https://github.com/vicentico/Masmac/actions/workflows/ci.yml/badge.svg)](https://github.com/vicentico/Masmac/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/vicentico/Masmac/actions/workflows/security.yml/badge.svg)](https://github.com/vicentico/Masmac/actions/workflows/security.yml)
 [![Tests](https://img.shields.io/badge/Tests-33%2F36%20Passing-brightgreen.svg)](https://github.com/vicentico/Masmac)
 [![Clean Code](https://img.shields.io/badge/Clean%20Code-Applied-success.svg)](./documentation/clean-code-improvements.md)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](./Dockerfile)
 
 ## 🚀 Últimas Mejoras Implementadas
 
@@ -62,7 +65,43 @@ VetUberApp/
    - Interface Segregation Principle
    - Dependency Inversion Principle
 
-## 📊 Modelo de Datos
+## � CI/CD Pipeline
+
+### 🚀 Flujo Automatizado
+
+```mermaid
+graph LR
+    A[Push/PR] --> B[CI Pipeline]
+    B --> C{Tests Pass?}
+    C -->|✅ Yes| D[Build Docker]
+    C -->|❌ No| E[❌ Fail]
+    D --> F[Security Scan]
+    F --> G[Deploy Staging]
+    G --> H[Smoke Tests]
+    H --> I{Manual Approval}
+    I -->|✅ Approved| J[Deploy Production]
+    I -->|❌ Rejected| K[❌ Stop]
+```
+
+### 🛠️ Workflows Implementados
+
+- **🔄 CI Pipeline**: Build, test, quality analysis
+- **🚀 CD Pipeline**: Automated deployment to staging/production
+- **🔐 Security Scan**: Daily vulnerability scanning
+- **📦 Dependency Updates**: Weekly automated updates
+- **🏷️ Release Management**: Automated releases and changelog
+
+### 📈 Quality Gates
+
+- ✅ **Build**: Solution compiles successfully
+- ✅ **Tests**: All unit and integration tests pass
+- ✅ **Coverage**: Code coverage meets threshold
+- ✅ **Security**: No critical vulnerabilities
+- ✅ **Docker**: Container builds successfully
+
+📖 **Documentación completa**: [CI/CD Pipeline](./documentation/cicd-pipeline.md)
+
+## �📊 Modelo de Datos
 
 ### 🏛️ Entidades Principales
 

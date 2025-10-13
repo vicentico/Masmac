@@ -48,6 +48,23 @@ tests/**/[Oo]bj/
 *.ipdb
 *.pgc
 *.pgd
+
+# CI/CD and DevOps
+coverage/
+TestResults/
+*.coverage
+*.coveragexml
+.coverage
+audit-results.json
+security-report.json
+trivy-results.sarif
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.rsp
 *.sbr
 *.tlb
