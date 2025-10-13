@@ -1,0 +1,102 @@
+name: ✨ Feature Request
+description: Solicitar una nueva funcionalidad para VetUberApp
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - vicentico
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por sugerir una nueva funcionalidad. Por favor proporciona los detalles necesarios para que podamos evaluar tu solicitud.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problema o necesidad
+      description: ¿Hay un problema que esta funcionalidad resolvería? Describe el contexto.
+      placeholder: Ej. Siempre es frustrante cuando [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Solución propuesta
+      description: Describe la solución que te gustaría ver implementada.
+      placeholder: Me gustaría que [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternativas consideradas
+      description: Describe cualquier solución alternativa o funcionalidad que hayas considerado.
+      placeholder: He considerado [...]
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Prioridad
+      description: ¿Qué tan importante es esta funcionalidad?
+      options:
+        - Baja - Nice to have
+        - Media - Importante para algunos casos de uso
+        - Alta - Crítica para el funcionamiento
+        - Crítica - Bloqueante
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: 🛠️ Complejidad estimada
+      description: ¿Qué tan complejo crees que sería implementar esto?
+      options:
+        - Simple - Cambio menor
+        - Moderada - Requiere algunos cambios
+        - Compleja - Requiere cambios significativos
+        - Muy compleja - Cambios arquitectónicos
+        - No estoy seguro
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: 👤 Historias de usuario
+      description: Describe cómo diferentes tipos de usuarios usarían esta funcionalidad.
+      placeholder: |
+        Como [tipo de usuario], quiero [funcionalidad] para que [beneficio].
+        
+        Ejemplo:
+        - Como veterinario, quiero ver el historial completo de una mascota para brindar mejor atención.
+        - Como dueño de mascota, quiero recibir recordatorios de citas para no olvidar las consultas.
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Criterios de aceptación
+      description: ¿Qué condiciones deben cumplirse para considerar esta funcionalidad como completa?
+      placeholder: |
+        - [ ] El usuario puede [acción específica]
+        - [ ] El sistema muestra [comportamiento específico]
+        - [ ] Se valida [condición específica]
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Contexto adicional
+      description: Agrega cualquier otra información, mockups, screenshots, o referencias que puedan ayudar.
+      placeholder: Cualquier información adicional que pueda ser útil...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Confirmación
+      description: Por favor confirma lo siguiente
+      options:
+        - label: He buscado funcionalidades similares antes de crear esta solicitud
+          required: true
+        - label: Esta funcionalidad está alineada con los objetivos del proyecto
+          required: true

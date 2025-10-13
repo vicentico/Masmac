@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discusiones
+    url: https://github.com/vicentico/Masmac/discussions
+    about: Para preguntas generales, ideas y discusiones sobre el proyecto
+  - name: 📚 Documentación
+    url: https://github.com/vicentico/Masmac/wiki
+    about: Consulta la documentación completa del proyecto
+  - name: 🔐 Vulnerabilidades de seguridad
+    url: https://github.com/vicentico/Masmac/security/advisories/new
+    about: Reportar vulnerabilidades de seguridad de forma privada
